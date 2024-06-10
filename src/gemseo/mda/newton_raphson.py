@@ -138,7 +138,7 @@ class MDANewtonRaphson(BaseMDARoot):
 
         self.linear_solver = linear_solver
         self.__newton_linear_solver_name = newton_linear_solver_name
-        self.__newton_linear_solver_options = newton_linear_solver_options or {}
+        self.__newton_linear_solver_options = newton_linear_solver_options or linear_solver_options or {}
 
         if not self._newton_coupling_names:
             msg = "There is no couplings to compute. Please consider using MDAChain."
