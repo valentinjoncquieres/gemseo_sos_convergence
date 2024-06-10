@@ -154,26 +154,8 @@ class BaseMDASolver(BaseMDA):
 
     def get_current_resolved_residual_vector(self) -> ndarray:
         """Return the vector of residuals."""
-        if not self.__resolved_residual_names:
-            return array([])
 
-        self.__compute_names_to_slices()
-
-        arrays = []
-
-        for (
-            converter,
-            couplings_names_to_slices,
-        ) in self.__resolved_residual_names_to_slices.items():
-            if couplings_names_to_slices:
-                arrays += [
-                    converter.convert_data_to_array(
-                        couplings_names_to_slices,
-                        self._current_residuals,
-                    )
-                ]
-
-        return concatenate(arrays)
+        return concatenate(list(self._current_residuals.values()))
 
     def _warn_convergence_criteria(self) -> tuple[bool, bool]:
         """Log a warning if max_iter is reached and if max residuals is above tolerance.
@@ -411,6 +393,18 @@ class BaseMDASolver(BaseMDA):
         super()._run()
         self._sequence_transformer.clear()
 
+    def convert_data_to_array(self, name, value) -> ndarray:
+        """Return the vector of residuals."""
+        self.__compute_names_to_slices()
+        for (
+            converter,
+            couplings_names_to_slices,
+        ) in self.__resolved_variable_names_to_slices.items():
+            if name in couplings_names_to_slices:
+                return converter.convert_value_to_array(name, value)
+
+        return array([])
+
     def _update_residuals(self, input_data: DisciplineData) -> None:
         """Update the residuals.
 
@@ -425,8 +419,9 @@ class BaseMDASolver(BaseMDA):
             input_data: The input data to compute residual of coupling variables.
         """
         for name in self._resolved_residual_names:
+            local_data_array = self.convert_data_to_array(name, self.local_data[name])
             if name in self._resolved_variable_names:
-                residual = self.local_data[name] - input_data[name]
+                residual = local_data_array - self.convert_data_to_array(name, input_data[name])
             else:
-                residual = self.local_data[name]
+                residual = local_data_array
             self._current_residuals[name] = residual
