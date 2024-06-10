@@ -934,8 +934,8 @@ class MDODiscipline(Serializable):
                 # If also an output, use a copy of the original input value
                 input_data_[key] = deepcopy(val)
 
-        # Non simple caches require NumPy arrays.
-        if not isinstance(self.cache, SimpleCache):
+        # Non simple caches require NumPy arrays. Check that cache is not None
+        if self.cache is not None and not isinstance(self.cache, SimpleCache):
             to_array = self.input_grammar.data_converter.convert_value_to_array
             for name, value in input_data_.items():
                 input_data_[name] = to_array(name, value)

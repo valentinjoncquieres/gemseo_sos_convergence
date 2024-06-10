@@ -279,12 +279,16 @@ class DisciplineJacApprox:
         if isinstance(step, Sized) and 1 < len(step) != len(x_vect):
             msg = f"Inconsistent step size, expected {x_vect.size} got {len(step)}."
             raise ValueError(msg)
-
-        with self.__set_zero_cache_tol():
+        # if the cache of the discipline is None self.__set_zero_cache_tol() raises an error.
+        if self.discipline.cache is not None:
+            with self.__set_zero_cache_tol():
+                flat_jac = atleast_2d(
+                    self.approximator.f_gradient(x_vect, x_indices=x_indices, step=step)
+                )
+        else:
             flat_jac = atleast_2d(
                 self.approximator.f_gradient(x_vect, x_indices=x_indices, step=step)
             )
-
         data_names_to_sizes = (
             self.discipline.output_grammar.data_converter.compute_names_to_sizes(
                 outputs,
