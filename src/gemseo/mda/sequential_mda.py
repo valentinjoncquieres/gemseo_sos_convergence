@@ -117,6 +117,7 @@ class MDAGSNewton(MDASequential):
         relax_factor: float = 0.99,
         linear_solver: str = "DEFAULT",
         max_mda_iter_gs: int = 3,
+        tolerance_gs: float = 1e-6,
         linear_solver_tolerance: float = 1e-12,
         scaling_method: MDASequential.ResidualScaling = MDASequential.ResidualScaling.INITIAL_RESIDUAL_NORM,
         warm_start: bool = False,
@@ -139,8 +140,9 @@ class MDAGSNewton(MDASequential):
         mda_gauss_seidel = MDAGaussSeidel(
             disciplines,
             max_mda_iter=max_mda_iter_gs,
+            grammar_type=grammar_type,
             scaling_method=scaling_method,
-            tolerance=tolerance,
+            tolerance=tolerance_gs,
             log_convergence=log_convergence,
         )
 
@@ -148,6 +150,8 @@ class MDAGSNewton(MDASequential):
             disciplines,
             max_mda_iter=max_mda_iter,
             grammar_type=grammar_type,
+            tolerance=tolerance,
+            linear_solver_tolerance=linear_solver_tolerance,
             scaling_method=scaling_method,
             use_lu_fact=use_lu_fact,
             coupling_structure=coupling_structure,
