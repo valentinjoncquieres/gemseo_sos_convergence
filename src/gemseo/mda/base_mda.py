@@ -207,6 +207,7 @@ class BaseMDA(MDODiscipline, metaclass=ABCGoogleDocstringInheritanceMeta):
         grammar_type: MDODiscipline.GrammarType = MDODiscipline.GrammarType.JSON,
         tolerance: float = 1e-6,
         linear_solver_tolerance: float = 1e-12,
+        scaling_method: ResidualScaling = ResidualScaling.INITIAL_RESIDUAL_NORM,
         warm_start: bool = False,
         use_lu_fact: bool = False,
         coupling_structure: MDOCouplingStructure | None = None,
@@ -264,7 +265,7 @@ class BaseMDA(MDODiscipline, metaclass=ABCGoogleDocstringInheritanceMeta):
             over_relaxation_factor, acceleration_method
         )
 
-        self.scaling = self.ResidualScaling.INITIAL_RESIDUAL_NORM
+        self.scaling = scaling_method
         self._scaling_data = None
 
         # Don't erase coupling values before calling _compute_jacobian
